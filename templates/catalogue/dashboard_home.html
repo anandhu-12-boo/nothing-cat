@@ -1,0 +1,84 @@
+{% extends "catalogue/dashboard_base.html" %}
+
+{% block title %}Overview | Nothing Admin{% endblock %}
+
+{% block content %}
+<div class="dashboard-panel">
+    <div class="dashboard-page-header">
+        <div>
+            <p class="dashboard-eyebrow">Overview</p>
+            <h1 class="dashboard-page-title">Product dashboard</h1>
+        </div>
+        <span class="live-badge"><i></i> Live catalogue</span>
+    </div>
+
+    <p class="dashboard-subtitle">Track inventory, categories and recent updates across the public Nothing product catalogue.</p>
+
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-icon">◫</div>
+            <div>
+                <strong>{{ total_products }}</strong>
+                <small>Total products</small>
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-icon">✓</div>
+            <div>
+                <strong>{{ active_products }}</strong>
+                <small>Active products</small>
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-icon">▣</div>
+            <div>
+                <strong>{{ total_categories }}</strong>
+                <small>Total categories</small>
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-icon">◌</div>
+            <div>
+                <strong>{{ total_brands }}</strong>
+                <small>Total brands</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-section">
+        <div class="dashboard-section-heading">
+            <h3>Recently added</h3>
+            <a class="dashboard-link" href="{% url 'dashboard_products' %}">View all products</a>
+        </div>
+
+        {% if recent_products %}
+            <div class="recent-list">
+                {% for product in recent_products %}
+                    <div class="recent-product-item">
+                        <div class="recent-product-thumb">
+                            {% with first_image=product.images.all|first %}
+                                {% if first_image and first_image.image %}
+                                    <img src="{{ first_image.image.url }}" alt="{{ product }}">
+                                {% else %}
+                                    <span>IMG</span>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+
+                        <div class="recent-product-info">
+                            <strong>{{ product.product_model|default:product.model }}</strong>
+                            <span>{{ product.brand.name }} · {{ product.variant|default:'Standard' }}</span>
+                            <small>Updated {{ product.updated_at|date:"d M Y" }}</small>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state-panel">No products have been added yet.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

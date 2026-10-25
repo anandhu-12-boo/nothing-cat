@@ -1,0 +1,435 @@
+{% extends "catalogue/base.html" %}
+{% load static %}
+{% block title %}Nothing Product Catalogue{% endblock %}
+
+{% block body_class %}editorial-home{% endblock %}
+
+{% block content %}
+
+<!-- EDITORIAL HERO -->
+<section class="editorial-hero">
+
+    <div class="editorial-pattern" aria-hidden="true"></div>
+    <div class="editorial-ring" aria-hidden="true"></div>
+    <div class="editorial-red-square" aria-hidden="true"></div>
+
+    <div class="editorial-hero-top">
+        <p class="editorial-eyebrow">
+            Official product catalogue
+        </p>
+
+        <span class="editorial-live-badge">
+            <i aria-hidden="true"></i>
+            Live catalogue
+        </span>
+    </div>
+
+    <div class="editorial-hero-content">
+        <div class="editorial-hero-copy">
+            <h1>
+                Find the right
+                <span>Nothing product<span class="red-dot">.</span></span>
+            </h1>
+
+            <p>
+                Current models, variants, specifications
+                and dealer prices in one place.
+            </p>
+        </div>
+
+        {% if hero_image %}
+            <div class="editorial-hero-product">
+                <img
+                    src="{{ hero_image.image.url }}"
+                    alt="Latest Nothing product"
+                >
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- SEARCH -->
+    <form
+        method="get"
+        action="{% url 'index' %}"
+        class="editorial-search"
+        id="search"
+        role="search"
+    >
+        <span class="editorial-search-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="6.5"></circle>
+                <path d="m16 16 4 4"></path>
+            </svg>
+        </span>
+
+        <input
+            type="search"
+            name="q"
+            value="{{ query }}"
+            placeholder="Search models, variants or colours"
+            aria-label="Search products"
+            autocomplete="off"
+        >
+
+        {% if query %}
+            <a
+                href="{% url 'index' %}#products"
+                class="editorial-search-clear"
+                aria-label="Clear search"
+            >
+                ×
+            </a>
+        {% else %}
+            <button
+                type="submit"
+                class="editorial-search-button"
+                aria-label="Search"
+            >
+                Search
+            </button>
+        {% endif %}
+    </form>
+
+    <!-- SUMMARY -->
+    <div class="editorial-summary-grid">
+
+        <article class="editorial-summary-card">
+            <span class="editorial-summary-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m12 3 8 5-8 5-8-5 8-5Z"></path>
+                    <path d="m4 12 8 5 8-5"></path>
+                    <path d="m4 16 8 5 8-5"></path>
+                </svg>
+            </span>
+
+            <span>
+                <strong>{{ total_models }}</strong>
+                <small>
+                    Active model{{ total_models|pluralize }}
+                </small>
+            </span>
+        </article>
+
+        <article class="editorial-summary-card">
+            <span class="editorial-summary-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 5h11l5 5-10 10-6-6V5Z"></path>
+                    <circle cx="9" cy="10" r="1.5"></circle>
+                </svg>
+            </span>
+
+            <span>
+                <strong>{{ total_variants }}</strong>
+                <small>
+                    Available variant{{ total_variants|pluralize }}
+                </small>
+            </span>
+        </article>
+
+    </div>
+
+</section>
+
+
+<!-- CATEGORIES -->
+<section
+    class="editorial-section editorial-catalogue"
+    id="catalogue"
+>
+    <div class="editorial-section-heading">
+        <div>
+            <p>Browse catalogue</p>
+            <h2>Browse by category</h2>
+        </div>
+
+        <span>
+            {{ categories|length }}
+            categor{{ categories|length|pluralize:"y,ies" }}
+        </span>
+    </div>
+
+    <div class="editorial-category-grid">
+
+        {% for item in category_cards %}
+            <a
+                href="{% url 'category_detail' item.category.slug %}"
+                class="editorial-category-card editorial-category-{{ forloop.counter }}"
+            >
+                <span
+                    class="category-dot-pattern"
+                    aria-hidden="true"
+                ></span>
+
+                <span class="editorial-category-number">
+                    0{{ forloop.counter }}
+                </span>
+
+                <div class="editorial-category-content">
+                    <h3>{{ item.category.name }}</h3>
+
+                    <p>
+                        {{ item.category.model_count }}
+                        model{{ item.category.model_count|pluralize }}
+
+                        <span>·</span>
+
+                        {{ item.category.product_count }}
+                        variant{{ item.category.product_count|pluralize }}
+                    </p>
+                </div>
+
+                <div class="editorial-category-image">
+                    {% if item.category.slug == "phones" %}
+                        <img
+                            src="{% static 'images/phone-card-display.png' %}"
+                            alt="Nothing phones"
+                            class="category-phone-hero"
+                        >
+                    {% elif item.image %}
+                        <img
+                            src="{{ item.image.image.url }}"
+                            alt="{{ item.category.name }}"
+                            loading="lazy"
+                        >
+                    {% else %}
+                        <span class="editorial-image-placeholder">
+                            {% if item.category.icon %}
+                                {{ item.category.icon }}
+                            {% else %}
+                                N
+                            {% endif %}
+                        </span>
+                    {% endif %}
+                </div>
+
+
+
+                <span
+                    class="editorial-category-arrow"
+                    aria-hidden="true"
+                >
+                    <svg viewBox="0 0 24 24">
+                        <path d="M5 12h14"></path>
+                        <path d="m14 7 5 5-5 5"></path>
+                    </svg>
+                </span>
+            </a>
+
+        {% empty %}
+            <div class="empty-state editorial-empty">
+                <div class="empty-icon">＋</div>
+
+                <h3>No categories available</h3>
+
+                <p>
+                    Add categories and Nothing products
+                    from Django Admin.
+                </p>
+            </div>
+        {% endfor %}
+
+    </div>
+</section>
+
+
+<!-- RECENT PRODUCTS -->
+<section
+    class="editorial-section"
+    id="products"
+>
+    <div class="editorial-section-heading">
+        <div>
+            <p>
+                {% if query %}
+                    Search results
+                {% else %}
+                    Latest catalogue
+                {% endif %}
+            </p>
+
+            <h2>
+                {% if query %}
+                    Results for “{{ query }}”
+                {% else %}
+                    Recently updated
+                {% endif %}
+            </h2>
+        </div>
+
+        {% if not query %}
+            <span class="editorial-sort">
+                Newest first
+            </span>
+        {% endif %}
+    </div>
+
+    <div class="editorial-product-list">
+
+        {% for item in recent_models %}
+            {% if item.is_standalone %}
+                <a
+                    href="{% url 'product_detail' item.variant.pk %}"
+                    class="editorial-product-row"
+                >
+            {% else %}
+                <a
+                    href="{% url 'model_detail' item.model.pk %}"
+                    class="editorial-product-row"
+                >
+            {% endif %}
+                <span class="editorial-product-index">
+                    {% if forloop.counter < 10 %}
+                        0{{ forloop.counter }}
+                    {% else %}
+                        {{ forloop.counter }}
+                    {% endif %}
+                </span>
+
+                <div class="editorial-product-image">
+                    {% if item.image %}
+                        <img
+                            src="{{ item.image.image.url }}"
+                            alt="{{ item.model.name }}"
+                            loading="lazy"
+                        >
+                    {% else %}
+                        <span>NOTHING</span>
+                    {% endif %}
+                </div>
+
+                <div class="editorial-product-information">
+                    <p>{{ item.model.category.name }}</p>
+
+                    <h3>{{ item.model.name }}</h3>
+
+                    {% if item.variant %}
+                        <small>
+                            {{ item.variant.variant|default:"Standard" }}
+                            <span>·</span>
+                            {{ item.variant_count }}
+                            variant{{ item.variant_count|pluralize }}
+                        </small>
+                    {% endif %}
+                </div>
+
+                {% if item.variant %}
+                    <div class="editorial-product-price">
+                        <small>MOP</small>
+
+                        <strong>
+                            ₹{{ item.variant.selling_price|floatformat:0 }}
+                        </strong>
+
+                        {% if item.variant.mrp %}
+                            <s>
+                                ₹{{ item.variant.mrp|floatformat:0 }}
+                            </s>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <span
+                    class="editorial-product-arrow"
+                    aria-hidden="true"
+                >
+                    <svg viewBox="0 0 24 24">
+                        <path d="m9 5 7 7-7 7"></path>
+                    </svg>
+                </span>
+            </a>
+
+        {% empty %}
+            <div class="empty-state editorial-empty">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="11" cy="11" r="6.5"></circle>
+                        <path d="m16 16 4 4"></path>
+                    </svg>
+                </div>
+
+                <h3>No products found</h3>
+
+                <p>
+                    Try another models, variant, colour or category.
+                </p>
+
+                {% if query %}
+                    <a
+                        href="{% url 'index' %}"
+                        class="empty-reset"
+                    >
+                        Clear search
+                    </a>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+    </div>
+</section>
+
+
+<!-- DOWNLOADS -->
+<section class="editorial-actions">
+
+    {% if latest_offer %}
+        <a
+            href="{{ latest_offer.file.url }}"
+            class="editorial-offer-button"
+            target="_blank"
+            rel="noopener"
+        >
+            <span class="editorial-action-icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M7 3h7l4 4v14H7V3Z"></path>
+                    <path d="M14 3v5h5"></path>
+                    <path d="M9.5 13h5"></path>
+                    <path d="M9.5 17h5"></path>
+                </svg>
+            </span>
+
+            <span class="editorial-action-copy">
+                <small>Current affordability offer</small>
+                <strong>{{ latest_offer.title }}</strong>
+                <span>Open PDF document</span>
+            </span>
+
+            <span class="editorial-action-arrow">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 12h14"></path>
+                    <path d="m14 7 5 5-5 5"></path>
+                </svg>
+            </span>
+        </a>
+    {% endif %}
+
+    <a
+        href="{% url 'export_excel' %}"
+        class="editorial-download-button"
+    >
+        <span class="editorial-action-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v12"></path>
+                <path d="m7.5 11 4.5 4.5 4.5-4.5"></path>
+                <path d="M5 20h14"></path>
+            </svg>
+        </span>
+
+        <span class="editorial-action-copy">
+            <small>Complete catalogue</small>
+            <strong>Download complete price list</strong>
+            <span>Nothing catalogue in Excel format</span>
+        </span>
+
+        <span class="editorial-action-pattern" aria-hidden="true"></span>
+
+        <span class="editorial-action-arrow">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 12h14"></path>
+                <path d="m14 7 5 5-5 5"></path>
+            </svg>
+        </span>
+    </a>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,339 @@
+{% extends "catalogue/base.html" %}
+
+{% block title %}
+    {{ product_model.name }} | Nothing Catalogue
+{% endblock %}
+
+{% block content %}
+
+<a
+    href="{% url 'category_detail' product_model.category.slug %}"
+    class="back-link"
+>
+    ← Back to {{ product_model.category.name }}
+</a>
+
+<section class="model-heading">
+    <p class="model-brand">
+        {{ product_model.brand.name }}
+        <span>•</span>
+        {{ product_model.category.name }}
+    </p>
+
+    <h2 class="model-title">
+        {{ product_model.name }}
+    </h2>
+
+    {% if product_model.description %}
+        <p class="model-description">
+            {{ product_model.description }}
+        </p>
+    {% endif %}
+</section>
+
+<!-- Selected colour image gallery -->
+<section class="product-gallery">
+    <div class="main-product-image">
+        {% if images %}
+            <img
+                id="main-product-image"
+                src="{{ images.0.image.url }}"
+                alt="{{ product_model.name }} {{ selected_colour }}"
+            >
+        {% else %}
+            <div class="no-product-image">
+                <span>NOTHING</span>
+                <small>Product image unavailable</small>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if images|length > 1 %}
+        <div class="image-thumbnails">
+            {% for product_image in images %}
+                <button
+                    type="button"
+                    class="image-thumbnail {% if forloop.first %}selected{% endif %}"
+                    data-full-image="{{ product_image.image.url }}"
+                    aria-label="View image {{ forloop.counter }}"
+                >
+                    <img
+                        src="{{ product_image.image.url }}"
+                        alt="{{ product_image.colour }}"
+                    >
+                </button>
+            {% endfor %}
+        </div>
+    {% endif %}
+</section>
+
+<!-- Variant selection -->
+{% if variant_options|length > 1 %}
+<section class="detail-section">
+    <div class="detail-section-heading">
+        <div>
+            <p class="detail-step">Step 1</p>
+            <h3>Select variant</h3>
+        </div>
+
+        <span>
+            {{ variant_options|length }}
+            available
+        </span>
+    </div>
+
+    <div class="variant-options">
+        {% for option in variant_options %}
+            <a
+                href="{{ option.url }}"
+                class="variant-option {% if option.is_selected %}selected{% endif %}"
+            >
+                <div class="variant-option-image">
+                    {% if option.image %}
+                        <img
+                            src="{{ option.image.image.url }}"
+                            alt="{{ option.product.variant }}"
+                        >
+                    {% else %}
+                        <span>NOTHING</span>
+                    {% endif %}
+                </div>
+
+                <div class="variant-option-information">
+                    <strong>
+                        {{ option.product.variant|default:"Standard" }}
+                    </strong>
+
+                    <span class="variant-mop">
+                        MOP ₹{{ option.product.selling_price|floatformat:0 }}
+                    </span>
+
+                    <s>
+                        MRP ₹{{ option.product.mrp|floatformat:0 }}
+                    </s>
+                </div>
+
+                <span class="selection-circle">
+                    {% if option.is_selected %}✓{% endif %}
+                </span>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Colour selection -->
+{% if colour_options|length > 1 %}
+<section class="detail-section">
+    <div class="detail-section-heading">
+        <div>
+            <p class="detail-step">Step 2</p>
+            <h3>Select colour</h3>
+        </div>
+
+        {% if selected_colour %}
+            <span>{{ selected_colour }}</span>
+        {% endif %}
+    </div>
+
+    <div class="colour-options">
+        {% for colour in colour_options %}
+            <a
+                href="{{ colour.url }}"
+                class="colour-option {% if colour.is_selected %}selected{% endif %}"
+            >
+                <div class="colour-image">
+                    {% if colour.image %}
+                        <img
+                            src="{{ colour.image.image.url }}"
+                            alt="{{ colour.name }}"
+                        >
+                    {% else %}
+                        <div class="colour-placeholder">
+                            {{ colour.name|slice:":1" }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <strong>{{ colour.name }}</strong>
+
+                <span class="colour-check">
+                    {% if colour.is_selected %}✓{% endif %}
+                </span>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Price details -->
+{% if selected_variant %}
+<section class="price-panel">
+    <div class="selected-product-summary">
+        <p>Your selection</p>
+
+        <strong>
+            {{ product_model.name }}
+            {% if selected_variant.variant and selected_variant.variant != "Standard" %}
+                · {{ selected_variant.variant }}
+            {% endif %}
+        </strong>
+
+        {% if selected_colour %}
+            <span>{{ selected_colour }}</span>
+        {% endif %}
+    </div>
+
+    <div class="price-details">
+        <div class="main-price">
+            <span>MOP</span>
+
+            <strong>
+                ₹{{ selected_variant.selling_price|floatformat:0 }}
+            </strong>
+        </div>
+
+        <div class="mrp-price">
+            <span>MRP</span>
+
+            <s>
+                ₹{{ selected_variant.mrp|floatformat:0 }}
+            </s>
+        </div>
+    </div>
+
+    {% if savings %}
+        <div class="saving-message">
+            You save ₹{{ savings|floatformat:0 }}
+
+            {% if discount_percentage %}
+                <span>
+                    {{ discount_percentage }}% off
+                </span>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="stock-status">
+        {% if selected_variant.stock > 0 %}
+            <span class="stock-dot available"></span>
+            In stock
+            <small>
+                {{ selected_variant.stock }} available
+            </small>
+        {% else %}
+            <span class="stock-dot unavailable"></span>
+            Currently unavailable
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Specifications -->
+<section class="detail-section specifications-section">
+    <div class="detail-section-heading">
+        <div>
+            <p class="detail-step">Product details</p>
+            <h3>Specifications</h3>
+        </div>
+    </div>
+
+    {% if specifications %}
+        <div class="specification-list">
+            {% for key, value in specifications.items %}
+                <div class="specification-row">
+                    <span>{{ key }}</span>
+                    <strong>{{ value }}</strong>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="specification-empty">
+            Specifications can be added from Django Admin.
+        </div>
+    {% endif %}
+</section>
+
+<!-- Documents -->
+{% if documents %}
+<section class="detail-section">
+    <div class="detail-section-heading">
+        <div>
+            <p class="detail-step">Downloads</p>
+            <h3>Product documents</h3>
+        </div>
+    </div>
+
+    <div class="document-list">
+        {% for document in documents %}
+            <a
+                href="{{ document.file.url }}"
+                target="_blank"
+                rel="noopener"
+                class="document-link"
+            >
+                <span class="document-icon">PDF</span>
+
+                <span>
+                    <strong>{{ document.title }}</strong>
+
+                    {% if document.version %}
+                        <small>{{ document.version }}</small>
+                    {% endif %}
+                </span>
+
+                <span class="document-arrow">↗</span>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- WhatsApp -->
+<section class="share-section">
+    <p>
+        Share the selected variant, colour, price and
+        product link directly through WhatsApp.
+    </p>
+
+    <a
+        href="{{ whatsapp_url }}"
+        target="_blank"
+        rel="noopener"
+        class="whatsapp-button"
+    >
+        <span>◉</span>
+        Share on WhatsApp
+    </a>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.querySelectorAll(
+        ".image-thumbnail"
+    ).forEach(function (button) {
+        button.addEventListener(
+            "click",
+            function () {
+                const mainImage = document.getElementById(
+                    "main-product-image"
+                );
+
+                if (mainImage) {
+                    mainImage.src = button.dataset.fullImage;
+                }
+
+                document.querySelectorAll(
+                    ".image-thumbnail"
+                ).forEach(function (thumbnail) {
+                    thumbnail.classList.remove("selected");
+                });
+
+                button.classList.add("selected");
+            }
+        );
+    });
+</script>
+{% endblock %}

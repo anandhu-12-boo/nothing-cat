@@ -1,0 +1,141 @@
+{% extends "catalogue/base.html" %}
+
+{% block title %}
+    {{ category.name }} | Nothing Catalogue
+{% endblock %}
+
+{% block content %}
+
+<section class="category-heading">
+    <a href="{% url 'index' %}" class="back-link">
+        ← All categories
+    </a>
+
+    <div class="heading-row">
+        <div>
+            <p class="eyebrow">Nothing Catalogue</p>
+            <h2 class="page-title">{{ category.name }}</h2>
+        </div>
+
+        <div class="product-count">
+            {{ product_models|length }}
+            model{{ product_models|length|pluralize }}
+        </div>
+    </div>
+</section>
+
+<form method="get" class="search-form">
+    <span class="search-icon">⌕</span>
+
+    <input
+        type="search"
+        name="q"
+        value="{{ query }}"
+        placeholder="Search model, variant or colour"
+        class="search-input"
+        autocomplete="off"
+    >
+
+    {% if query %}
+        <a
+            href="{% url 'category_detail' category.slug %}"
+            class="clear-search"
+            aria-label="Clear search"
+        >
+            ×
+        </a>
+    {% endif %}
+</form>
+
+<section class="product-list">
+    {% for product_model in product_models %}
+
+        {% with first_variant=product_model.variants.all.0 %}
+            <a
+                href="{% url 'model_detail' product_model.pk %}"
+                class="product-card"
+            >
+                <div class="product-image-box">
+                   {% with variant_image=first_variant.images.all.0 shared_image=product_model.images.all.0 %}
+
+                        {% if variant_image %}
+                            <img
+                                src="{{ variant_image.image.url }}"
+                                alt="{{ product_model.name }}"
+                                class="product-image"
+                            >
+
+                        {% elif shared_image %}
+                            <img
+                                src="{{ shared_image.image.url }}"
+                                alt="{{ product_model.name }}"
+                                class="product-image"
+                            >
+
+                        {% else %}
+                            <span class="image-placeholder">
+                                NOTHING
+                            </span>
+                        {% endif %}
+
+                    {% endwith %}
+                </div>
+
+                <div class="product-information">
+                    <p class="product-category">
+                        {{ product_model.category.name }}
+                    </p>
+
+                    <h3 class="product-name">
+                        {{ product_model.name }}
+                    </h3>
+
+                    {% if product_model.description %}
+                        <p class="product-description">
+                            {{ product_model.description }}
+                        </p>
+                    {% endif %}
+
+                    {% if first_variant %}
+                        <div class="price-row">
+                            <strong class="selling-price">
+                                ₹{{ first_variant.selling_price|floatformat:0 }}
+                            </strong>
+
+                            <s class="mrp">
+                                ₹{{ first_variant.mrp|floatformat:0 }}
+                            </s>
+                        </div>
+
+                        {% if first_variant.variant %}
+                            <p class="starting-variant">
+                                Starting with {{ first_variant.variant }}
+                            </p>
+                        {% endif %}
+                    {% endif %}
+
+                    <p class="variant-count">
+                        {{ product_model.variants.all|length }}
+                        variant{{ product_model.variants.all|length|pluralize }}
+                    </p>
+                </div>
+
+                <span class="card-arrow">›</span>
+            </a>
+        {% endwith %}
+
+    {% empty %}
+        <div class="empty-state">
+            <div class="empty-icon">⌕</div>
+
+            <h3>No Nothing products found</h3>
+
+            <p>
+                Try another search or add products through
+                Django Admin.
+            </p>
+        </div>
+    {% endfor %}
+</section>
+
+{% endblock %}

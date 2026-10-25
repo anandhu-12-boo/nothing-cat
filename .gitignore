@@ -1,0 +1,19 @@
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.env
+.idea/
+.vscode/
+db.sqlite3
+staticfiles/
+
+# Local databases and backups
+*.sqlite3
+catalogue_backup.json
+catalogue_data.json
+
+# Uploaded product images and transfer archives
+media/
+media.zip
+db.zip

@@ -1,0 +1,189 @@
+<nav
+    class="no-scrollbar mb-3 flex gap-2
+           overflow-x-auto pb-1"
+    aria-label="Brands"
+>
+
+    <button
+        type="button"
+        data-brand=""
+        class="brand-pill
+               {% if not selected_brand %}active{% endif %}"
+        hx-get="{% url 'product_results' %}{% if query %}?q={{ query|urlencode }}{% endif %}"
+        hx-target="#catalogueContent"
+        hx-push-url="true"
+    >
+        <b>All</b>
+        <span>{{ total_products }}</span>
+    </button>
+
+
+    {% for brand in brands %}
+
+        <button
+            type="button"
+            data-brand="{{ brand.slug }}"
+            class="brand-pill brand-{{ brand.slug }}
+                   {% if selected_brand == brand.slug %}active{% endif %}"
+            hx-get="{% url 'product_results' %}?brand={{ brand.slug }}{% if query %}&q={{ query|urlencode }}{% endif %}"
+            hx-target="#catalogueContent"
+            hx-push-url="true"
+        >
+            <b>
+                {{ brand.logo_text|default:brand.name }}
+            </b>
+
+            <span>
+                {{ brand.product_count }} models
+            </span>
+        </button>
+
+    {% endfor %}
+
+</nav>
+{% if brand_documents %}
+
+<section class="mb-4 space-y-2">
+
+    {% for document in brand_documents %}
+
+        <a
+            href="{{ document.file.url }}"
+            target="_blank"
+            rel="noopener"
+            class="flex min-h-12 items-center
+                   justify-between rounded-xl
+                   border border-slate-200
+                   bg-white px-4 py-3
+                   text-sm font-semibold
+                   text-slate-700 no-underline
+                   shadow-sm"
+        >
+            <span>
+                {% if document.document_type == "affordability" %}
+                    📄 View Current Affordability Offers
+                {% else %}
+                    📱 View Product Catalogue
+                {% endif %}
+            </span>
+
+            <span class="text-slate-400">
+                PDF ↗
+            </span>
+        </a>
+
+    {% endfor %}
+
+</section>
+
+{% endif %}
+
+
+<section class="divide-y divide-slate-100">
+
+    {% for product in products %}
+
+        <a
+            href="{% url 'product_detail' product.pk %}"
+            class="grid min-h-[76px] w-full
+                   grid-cols-[56px_minmax(0,1fr)_105px]
+                   items-center gap-3 py-2.5
+                   text-left text-slate-800
+                   no-underline transition
+                   hover:bg-slate-50"
+        >
+
+            <div
+                class="flex h-14 w-14
+                       items-center justify-center
+                       overflow-hidden rounded-lg
+                       bg-slate-50"
+            >
+
+                {% with first_image=product.images.first %}
+
+                    {% if first_image %}
+
+                        <img
+                            src="{{ first_image.image.url }}"
+                            alt="{{ product.model }}"
+                            class="h-full w-full
+                                   object-contain p-1"
+                        >
+
+                    {% else %}
+
+                        <span
+                            class="logo logo-{{ product.brand.slug }}"
+                        >
+                            {{ product.brand.logo_text|default:product.brand.name }}
+                        </span>
+
+                    {% endif %}
+
+                {% endwith %}
+
+            </div>
+
+
+            <div class="min-w-0">
+
+                <h2
+                    class="truncate text-[15px]
+                           font-bold sm:text-base"
+                >
+                    {{ product.model }}
+
+                    {% if product.variant %}
+                        {{ product.variant }}
+                    {% endif %}
+                </h2>
+
+                <p
+                    class="truncate text-xs
+                           text-slate-500 sm:text-sm"
+                >
+                    {{ product.description }}
+                </p>
+
+            </div>
+
+
+            <div class="text-right">
+
+                <strong
+                    class="block text-[17px]
+                           sm:text-xl"
+                >
+                    ₹{{ product.selling_price|floatformat:0 }}
+                </strong>
+
+                <span
+                    class="text-[11px]
+                           text-slate-400 sm:text-xs"
+                >
+                    MRP
+                    <s>
+                        ₹{{ product.mrp|floatformat:0 }}
+                    </s>
+                </span>
+
+            </div>
+
+        </a>
+
+    {% empty %}
+
+        <div class="py-16 text-center">
+
+            <b>No products found</b>
+
+            <p class="mt-1 text-sm text-slate-500">
+                Try another model or brand.
+            </p>
+
+        </div>
+
+    {% endfor %}
+
+</section>

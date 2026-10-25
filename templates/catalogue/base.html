@@ -1,0 +1,241 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, viewport-fit=cover"
+    >
+
+    <meta name="theme-color" content="#101010">
+
+    <meta
+        name="description"
+        content="Official Nothing product catalogue with models, variants, specifications and dealer prices."
+    >
+
+    <title>
+        {% block title %}Nothing Catalogue{% endblock %}
+    </title>
+
+    <link rel="manifest" href="{% url 'manifest' %}">
+
+    <link
+        rel="icon"
+        href="{% static 'icons/icon.svg' %}"
+        type="image/svg+xml"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/app.css' %}?v=10"
+    >
+
+    {% block extra_head %}
+    {% endblock %}
+</head>
+
+<body class="{% block body_class %}{% endblock %}">
+
+    <a href="#main-content" class="skip-link">
+        Skip to content
+    </a>
+
+    <main class="app-shell" id="main-content">
+
+        <header class="site-header" id="top">
+            <a
+                href="{% url 'index' %}"
+                class="brand-link"
+                aria-label="Nothing Catalogue homepage"
+            >
+                <span class="brand-mark">
+                    <img
+                        src="{% static 'icons/nothing-logo.svg' %}"
+                        alt="Nothing"
+                        class="brand-logo-image"
+                        width="38"
+                        height="38"
+                    >
+                </span>
+
+                <span class="brand-text">
+                    <span class="site-title">
+                        Nothing Catalogue
+                    </span>
+
+                    <span class="site-subtitle">
+                        {% if latest_updated %}
+                            Official catalogue · Updated
+                            {{ latest_updated|date:"d M Y, h:i A" }}
+                        {% else %}
+                            Official phones and accessories catalogue
+                        {% endif %}
+                    </span>
+                </span>
+            </a>
+        </header>
+
+        <section class="page-content">
+            {% block content %}
+            {% endblock %}
+        </section>
+
+        <footer class="site-footer">
+            <p>
+                <span>Nothing Product Catalogue</span>
+                <span aria-hidden="true">•</span>
+                <span>Prices and availability may change</span>
+            </p>
+        </footer>
+
+    </main>
+
+    <nav class="mobile-nav" aria-label="Primary navigation">
+
+        <a
+            href="{% url 'index' %}"
+            class="mobile-nav-item"
+            aria-label="Home"
+        >
+            <svg
+                class="mobile-nav-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+                <path d="M3 11.5 12 4l9 7.5"></path>
+                <path d="M5.5 10v10h13V10"></path>
+                <path d="M9.5 20v-6h5v6"></path>
+            </svg>
+
+            <span>Home</span>
+        </a>
+
+        <a
+            href="{% url 'index' %}#catalogue"
+            class="mobile-nav-item"
+            aria-label="Browse catalogue"
+        >
+            <svg
+                class="mobile-nav-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+                <rect
+                    x="4"
+                    y="4"
+                    width="6"
+                    height="6"
+                    rx="1"
+                ></rect>
+
+                <rect
+                    x="14"
+                    y="4"
+                    width="6"
+                    height="6"
+                    rx="1"
+                ></rect>
+
+                <rect
+                    x="4"
+                    y="14"
+                    width="6"
+                    height="6"
+                    rx="1"
+                ></rect>
+
+                <rect
+                    x="14"
+                    y="14"
+                    width="6"
+                    height="6"
+                    rx="1"
+                ></rect>
+            </svg>
+
+            <span>Catalogue</span>
+        </a>
+
+        <a
+            href="{% url 'index' %}#search"
+            class="mobile-nav-item"
+            aria-label="Search products"
+        >
+            <svg
+                class="mobile-nav-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+                <circle cx="11" cy="11" r="6.5"></circle>
+                <path d="m16 16 4 4"></path>
+            </svg>
+
+            <span>Search</span>
+        </a>
+
+        {% if latest_offer %}
+            <a
+                href="{{ latest_offer.file.url }}"
+                class="mobile-nav-item"
+                target="_blank"
+                rel="noopener"
+                aria-label="Open current offers"
+            >
+                <svg
+                    class="mobile-nav-icon"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <path d="M7 3h7l4 4v14H7V3Z"></path>
+                    <path d="M14 3v5h5"></path>
+                    <path d="M9.5 13h5"></path>
+                    <path d="M9.5 17h5"></path>
+                </svg>
+
+                <span>Offers</span>
+            </a>
+        {% else %}
+            <a
+                href="{% url 'export_excel' %}"
+                class="mobile-nav-item"
+                aria-label="Download price list"
+            >
+                <svg
+                    class="mobile-nav-icon"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <path d="M12 3v12"></path>
+                    <path d="m7.5 11 4.5 4.5 4.5-4.5"></path>
+                    <path d="M5 20h14"></path>
+                </svg>
+
+                <span>Price list</span>
+            </a>
+        {% endif %}
+
+    </nav>
+
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function () {
+                navigator.serviceWorker
+                    .register("/service-worker.js")
+                    .catch(function (error) {
+                        console.warn(
+                            "Service worker registration failed:",
+                            error
+                        );
+                    });
+            });
+        }
+    </script>
+
+    {% block scripts %}
+    {% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,81 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#111111">
+    <title>Nothing Admin Login</title>
+    <link rel="stylesheet" href="{% static 'css/app.css' %}?v=12">
+</head>
+<body class="dashboard-auth-body">
+    <div class="dashboard-auth-card">
+        <div class="dashboard-brand-wrap auth-brand">
+            <div class="dashboard-brand-mark">N</div>
+            <div>
+                <div class="dashboard-brand-name">Nothing</div>
+                <div class="dashboard-brand-subtitle">Admin dashboard</div>
+            </div>
+        </div>
+
+        <h1 class="dashboard-auth-title">Sign in</h1>
+        <p class="dashboard-auth-copy">Use your authorised email and password to manage the product catalogue.</p>
+
+        {% if messages %}
+            <div class="dashboard-message-stack auth-messages">
+                {% for message in messages %}
+                    <div class="dashboard-message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" action="{{ form_action }}" class="dashboard-auth-form">
+            {% csrf_token %}
+            {% if next_url %}
+                <input type="hidden" name="next" value="{{ next_url }}">
+            {% endif %}
+
+            <label class="field-label" for="username">Email address</label>
+            <input
+                id="username"
+                class="dashboard-input"
+                type="email"
+                name="username"
+                placeholder="name@example.com"
+                autocomplete="email"
+                required
+            >
+
+            <label class="field-label" for="password">Password</label>
+            <div class="password-field-wrap">
+                <input
+                    id="password"
+                    class="dashboard-input"
+                    type="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required
+                >
+                <button type="button" class="password-toggle" aria-label="Show password">Show</button>
+            </div>
+
+            <button type="submit" class="dashboard-primary-button auth-submit">Sign in</button>
+        </form>
+    </div>
+
+    <script>
+        const toggleButton = document.querySelector('.password-toggle');
+        const passwordInput = document.getElementById('password');
+
+        if (toggleButton && passwordInput) {
+            toggleButton.addEventListener('click', function () {
+                const isHidden = passwordInput.type === 'password';
+                passwordInput.type = isHidden ? 'text' : 'password';
+                toggleButton.textContent = isHidden ? 'Hide' : 'Show';
+                toggleButton.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+            });
+        }
+    </script>
+</body>
+</html>
