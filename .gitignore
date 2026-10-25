@@ -3,6 +3,9 @@ venv/
 __pycache__/
 *.py[cod]
 .env
+.env.*
+!.env.example
+.envrc
 .idea/
 .vscode/
 db.sqlite3
@@ -12,8 +15,12 @@ staticfiles/
 *.sqlite3
 catalogue_backup.json
 catalogue_data.json
+catalogue-data.json
 
 # Uploaded product images and transfer archives
 media/
 media.zip
 db.zip
+*.sql
+*.dump
+*.backup

@@ -1,6 +1,10 @@
+import os
 from decimal import Decimal
+from io import StringIO
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
+from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 
@@ -242,6 +246,29 @@ class CatalogueTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertIn("/dashboard/login/", response["Location"])
+
+    def test_setup_admin_does_not_reset_password_unless_requested(self):
+        user_model = get_user_model()
+        user = user_model.objects.create_user(
+            username="heimglobal@gmail.com",
+            email="heimglobal@gmail.com",
+            password="ExistingPassword!123",
+        )
+
+        with patch.dict(os.environ, {"NOTHING_ADMIN_PASSWORD": "NewPassword!123"}):
+            call_command("setup_admin", stdout=StringIO())
+
+            user.refresh_from_db()
+            self.assertTrue(user.check_password("ExistingPassword!123"))
+
+            call_command(
+                "setup_admin",
+                "--reset-password",
+                stdout=StringIO(),
+            )
+
+        user.refresh_from_db()
+        self.assertTrue(user.check_password("NewPassword!123"))
 
     def test_dashboard_login_and_product_management(self):
         user_model = get_user_model()
