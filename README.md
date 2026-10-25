@@ -18,19 +18,35 @@ Mobile-first, desktop-compatible Django PWA with HTMX filtering and Tailwind sty
 ## Run on Windows
 
 ```powershell
-cd gravity_pwa_catalogue
+cd "C:\Users\boo\Desktop\nthoing catloge\nothing-product-catalogue"
 py -m venv venv
 venv\Scripts\activate
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 python manage.py migrate
-python manage.py seed_catalogue
 $env:NOTHING_ADMIN_PASSWORD = "your-secure-password"
 python manage.py setup_admin
 python manage.py runserver
 ```
 
 Open http://127.0.0.1:8000/. Admin dashboard login is at http://127.0.0.1:8000/dashboard/login/.
+
+## Deploy on Vercel
+
+Vercel's function filesystem is not a persistent, writable database. Do not use
+SQLite for a Vercel deployment. Create a hosted PostgreSQL database and add its
+connection URL to the Vercel project as `DATABASE_URL` (or `POSTGRES_URL`).
+Also configure:
+
+- `DJANGO_SECRET_KEY`: a long, random secret used only by Django.
+- `DJANGO_ALLOWED_HOSTS`: comma-separated hostnames, including the
+  `.vercel.app` suffix and any custom domain.
+- `DJANGO_CSRF_TRUSTED_ORIGINS`: comma-separated origins including `https://`
+  and any custom domain, if using one.
+
+The app defaults to `DEBUG=False`; only set `DJANGO_DEBUG=true` for local
+development. Run `python manage.py migrate` against the hosted database before
+serving traffic. Local development continues to use `db.sqlite3`.
 
 ## Dashboard login
 
