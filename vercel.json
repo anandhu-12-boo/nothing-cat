@@ -1,0 +1,17 @@
+{
+  "buildCommand": "python manage.py collectstatic --noinput",
+  "functions": {
+    "api/index.py": {
+      "includeFiles": [
+        "staticfiles/**",
+        "templates/**"
+      ]
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.py"
+    }
+  ]
+}

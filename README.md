@@ -44,6 +44,11 @@ Also configure:
 - `DJANGO_CSRF_TRUSTED_ORIGINS`: comma-separated origins including `https://`
   and any custom domain, if using one.
 
+Set the variables for the Vercel environments you deploy (Production and, if
+used, Preview). Set the project's Root Directory to the repository root. The
+included `vercel.json` routes requests to Django, collects static assets, and
+packages templates/static files with the function.
+
 The app defaults to `DEBUG=False`; only set `DJANGO_DEBUG=true` for local
 development. Run `python manage.py migrate` against the hosted database before
 serving traffic. Local development continues to use `db.sqlite3`.
