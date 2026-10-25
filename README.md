@@ -51,7 +51,9 @@ packages templates/static files with the function.
 
 The app defaults to `DEBUG=False`; only set `DJANGO_DEBUG=true` for local
 development. Run `python manage.py migrate` against the hosted database before
-serving traffic. Local development continues to use `db.sqlite3`.
+serving traffic. `collectstatic` can run during the Vercel build without the
+runtime secret; Django still requires `DJANGO_SECRET_KEY` when serving requests.
+Local development continues to use `db.sqlite3`.
 
 ## Dashboard login
 

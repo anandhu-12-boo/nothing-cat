@@ -1,4 +1,6 @@
 import os
+import secrets
+import sys
 from pathlib import Path
 
 import dj_database_url
@@ -11,10 +13,14 @@ IS_VERCEL = os.environ.get("VERCEL") == "1"
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 if not SECRET_KEY:
     if IS_VERCEL:
-        raise ImproperlyConfigured(
-            "Set DJANGO_SECRET_KEY in the Vercel project environment."
-        )
-    SECRET_KEY = "django-insecure-local-development-only"
+        if sys.argv[1:2] == ["collectstatic"]:
+            SECRET_KEY = secrets.token_urlsafe(50)
+        else:
+            raise ImproperlyConfigured(
+                "Set DJANGO_SECRET_KEY in the Vercel project environment."
+            )
+    else:
+        SECRET_KEY = "django-insecure-local-development-only"
 
 DEBUG = os.environ.get("DJANGO_DEBUG", "").lower() in {"1", "true", "yes"}
 
