@@ -47,3 +47,4 @@ python manage.py runserver 0.0.0.0:8000
 ```
 
 Find the computer's IPv4 address with `ipconfig`, then open `http://YOUR-IP:8000/` on the phone. PWA installation requires HTTPS in production (localhost is exempt during development).
+# nothing-cat
